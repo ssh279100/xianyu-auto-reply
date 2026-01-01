@@ -625,7 +625,7 @@ class XianyuLive:
             logger.error(f"【{self.cookie_id}】清理日志文件时出错: {self._safe_str(e)}")
             return 0
 
-    def __init__(self, cookies_str=None, cookie_id: str = "default", user_id: int = None):
+    def __init__(self, cookies_str=None, cookie_id: str = "default", user_id: int = None, remark: str = ""):
         """初始化闲鱼直播类"""
         logger.info(f"【{cookie_id}】开始初始化XianyuLive...")
 
@@ -641,6 +641,7 @@ class XianyuLive:
         self.cookie_id = cookie_id  # 唯一账号标识
         self.cookies_str = cookies_str  # 保存原始cookie字符串
         self.user_id = user_id  # 保存用户ID，用于token刷新时保持正确的所有者关系
+        self.remark = remark  # 账号备注，用于通知显示
         self.base_url = WEBSOCKET_URL
 
         if 'unb' not in self.cookies:
@@ -3533,12 +3534,12 @@ class XianyuLive:
             logger.info(f"📱 找到 {len(notifications)} 个通知渠道配置")
 
             # 构建通知消息
+            # 使用备注作为账号显示名，如果没有备注则使用 cookie_id
+            account_display = self.remark if self.remark else self.cookie_id
             notification_msg = f"🚨 接收消息通知\n\n" \
-                             f"账号: {self.cookie_id}\n" \
-                             f"买家: {send_user_name} (ID: {send_user_id})\n" \
-                             f"商品ID: {item_id or '未知'}\n" \
-                             f"聊天ID: {chat_id or '未知'}\n" \
-                             f"消息内容: {send_message}\n" \
+                             f"账号: {account_display}\n" \
+                             f"买家: {send_user_name}\n" \
+                             f"消息内容: **{send_message}**\n" \
                              f"时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
             # 发送通知到各个渠道
@@ -4104,20 +4105,23 @@ class XianyuLive:
                 return
 
             # 构造通知消息
+            # 使用备注作为账号显示名，如果没有备注则使用 cookie_id
+            account_display = self.remark if self.remark else self.cookie_id
+
             # 判断异常信息中是否包含"滑块验证成功"
             if "滑块验证成功" in error_message:
                 notification_msg = f"{error_message}\n\n" \
-                                  f"账号: {self.cookie_id}\n" \
+                                  f"账号: {account_display}\n" \
                                   f"时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
             elif verification_url:
                 # 如果有验证链接，添加到消息中
                 notification_msg = f"{error_message}\n\n" \
-                                  f"账号: {self.cookie_id}\n" \
+                                  f"账号: {account_display}\n" \
                                   f"时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n" \
                                   f"验证链接: {verification_url}\n"
             else:
                 notification_msg = f"Token刷新异常\n\n" \
-                                  f"账号ID: {self.cookie_id}\n" \
+                                  f"账号: {account_display}\n" \
                                   f"异常时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}\n" \
                                   f"异常信息: {error_message}\n\n" \
                                   f"请检查账号Cookie是否过期，如有需要请及时更新Cookie配置。\n"

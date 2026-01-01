@@ -3260,13 +3260,8 @@ class DBManager:
                 LEFT JOIN cards c ON dr.card_id = c.id
                 WHERE dr.enabled = 1 AND c.enabled = 1
                 AND (? LIKE '%' || dr.keyword || '%' OR dr.keyword LIKE '%' || ? || '%')
-                ORDER BY
-                    CASE
-                        WHEN ? LIKE '%' || dr.keyword || '%' THEN LENGTH(dr.keyword)
-                        ELSE LENGTH(dr.keyword) / 2
-                    END DESC,
-                    dr.id ASC
-                ''', (keyword, keyword, keyword))
+                ORDER BY dr.id ASC
+                ''', (keyword, keyword))
 
                 rules = []
                 for row in cursor.fetchall():
@@ -3440,13 +3435,8 @@ class DBManager:
                     WHERE dr.enabled = 1 AND c.enabled = 1
                     AND (? LIKE '%' || dr.keyword || '%' OR dr.keyword LIKE '%' || ? || '%')
                     AND c.is_multi_spec = 1 AND c.spec_name = ? AND c.spec_value = ?
-                    ORDER BY
-                        CASE
-                            WHEN ? LIKE '%' || dr.keyword || '%' THEN LENGTH(dr.keyword)
-                            ELSE LENGTH(dr.keyword) / 2
-                        END DESC,
-                        dr.delivery_times ASC
-                    ''', (keyword, keyword, spec_name, spec_value, keyword))
+                    ORDER BY dr.id ASC
+                    ''', (keyword, keyword, spec_name, spec_value))
 
                     rules = []
                     for row in cursor.fetchall():
@@ -3498,13 +3488,8 @@ class DBManager:
                 WHERE dr.enabled = 1 AND c.enabled = 1
                 AND (? LIKE '%' || dr.keyword || '%' OR dr.keyword LIKE '%' || ? || '%')
                 AND (c.is_multi_spec = 0 OR c.is_multi_spec IS NULL)
-                ORDER BY
-                    CASE
-                        WHEN ? LIKE '%' || dr.keyword || '%' THEN LENGTH(dr.keyword)
-                        ELSE LENGTH(dr.keyword) / 2
-                    END DESC,
-                    dr.delivery_times ASC
-                ''', (keyword, keyword, keyword))
+                ORDER BY dr.id ASC
+                ''', (keyword, keyword))
 
                 rules = []
                 for row in cursor.fetchall():

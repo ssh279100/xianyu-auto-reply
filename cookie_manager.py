@@ -66,9 +66,15 @@ class CookieManager:
             from XianyuAutoAsync import XianyuLive  # 延迟导入，避免循环
             logger.info(f"【{cookie_id}】XianyuLive导入成功")
 
+            # 获取备注信息
+            from db_manager import db_manager
+            cookie_info = db_manager.get_cookie_details(cookie_id)
+            remark = cookie_info.get('remark', '') if cookie_info else ''
+
             logger.info(f"【{cookie_id}】开始创建XianyuLive实例...")
             logger.info(f"【{cookie_id}】Cookie值长度: {len(cookie_value)}")
-            live = XianyuLive(cookie_value, cookie_id=cookie_id, user_id=user_id)
+            logger.info(f"【{cookie_id}】账号备注: {remark if remark else '(无)'}")
+            live = XianyuLive(cookie_value, cookie_id=cookie_id, user_id=user_id, remark=remark)
             logger.info(f"【{cookie_id}】XianyuLive实例创建成功，开始调用main()...")
             
             # 强制刷新日志，确保日志被写入
